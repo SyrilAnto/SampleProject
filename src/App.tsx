@@ -19,12 +19,12 @@ export type WorkItem = {
 
 export type User = {
   username: string;
-  role: 'admin' | 'employee';
+  role: 'admin' | 'user1' | 'user2' | 'user3' | 'employee';
 };
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [currentPage, setCurrentPage] = useState<'assign' | 'status' | 'reports'>('assign');
+  const [currentPage, setCurrentPage] = useState<'assign' | 'status' | 'reports'>('status');
   const [workItems, setWorkItems] = useState<WorkItem[]>([]);
 
   useEffect(() => {
@@ -49,8 +49,9 @@ export default function App() {
     // Mock authentication
     const users = [
       { username: 'admin', password: 'admin123', role: 'admin' as const },
-      { username: 'user1', password: 'pass123', role: 'employee' as const },
-      { username: 'user2', password: 'pass123', role: 'employee' as const },
+      { username: 'user1', password: 'pass123', role: 'user1' as const },
+      { username: 'user2', password: 'pass123', role: 'user2' as const },
+      { username: 'user3', password: 'pass123', role: 'user3' as const },
     ];
 
     const user = users.find(u => u.username === username && u.password === password);
@@ -67,7 +68,7 @@ export default function App() {
   const handleLogout = () => {
     setCurrentUser(null);
     localStorage.removeItem('currentUser');
-    setCurrentPage('assign');
+    setCurrentPage('status');
   };
 
   const addWorkItem = (item: Omit<WorkItem, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -100,13 +101,26 @@ export default function App() {
         currentUser={currentUser}
         onLogout={handleLogout}
       />
-      
       <main className="max-w-7xl mx-auto px-4 py-8">
-        {currentPage === 'assign' && (
+        {currentPage === 'assign' && currentUser.role === 'admin' && (
           <WorkAssigning 
             currentUser={currentUser}
             onAddWork={addWorkItem}
           />
+        )}
+        
+        {currentPage === 'assign' && currentUser.role === 'user1' && (
+          <WorkAssigning 
+            currentUser={currentUser}
+            onAddWork={addWorkItem}
+          />
+        )}
+        
+        {(currentPage === 'assign' && (currentUser.role === 'user2' || currentUser.role === 'user3')) && (
+          <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-sm p-8 text-center">
+            <div className="text-red-600 text-lg font-semibold mb-2">Access Denied</div>
+            <p className="text-gray-600">You don't have permission to assign work.</p>
+          </div>
         )}
         
         {currentPage === 'status' && (
@@ -117,13 +131,21 @@ export default function App() {
           />
         )}
         
-        {currentPage === 'reports' && (
+        {currentPage === 'reports' && currentUser.role === 'admin' && (
           <Reports 
             workItems={workItems}
             currentUser={currentUser}
           />
         )}
+        
+        {(currentPage === 'reports' && currentUser.role !== 'admin') && (
+          <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-sm p-8 text-center">
+            <div className="text-red-600 text-lg font-semibold mb-2">Access Denied</div>
+            <p className="text-gray-600">Only administrators can view reports.</p>
+          </div>
+        )}
       </main>
     </div>
   );
 }
+

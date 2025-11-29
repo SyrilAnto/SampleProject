@@ -9,11 +9,32 @@ type NavigationProps = {
 };
 
 export function Navigation({ currentPage, onNavigate, currentUser, onLogout }: NavigationProps) {
-  const navItems = [
-    { id: 'assign' as const, label: 'Assign Work', icon: ClipboardList },
-    { id: 'status' as const, label: 'Update Status', icon: ListChecks },
-    { id: 'reports' as const, label: 'Reports', icon: BarChart3 },
-  ];
+  const getNavItems = () => {
+    switch (currentUser.role) {
+      case 'admin':
+        return [
+          { id: 'assign' as const, label: 'Assign Work', icon: ClipboardList },
+          { id: 'status' as const, label: 'View Status', icon: ListChecks },
+          { id: 'reports' as const, label: 'Reports', icon: BarChart3 },
+        ];
+      case 'user1':
+        return [
+          { id: 'assign' as const, label: 'Assign Work', icon: ClipboardList },
+          { id: 'status' as const, label: 'View Status', icon: ListChecks },
+        ];
+      case 'user2':
+      case 'user3':
+        return [
+          { id: 'status' as const, label: 'Update Status', icon: ListChecks },
+        ];
+      default:
+        return [
+          { id: 'status' as const, label: 'Update Status', icon: ListChecks },
+        ];
+    }
+  };
+
+  const navItems = getNavItems();
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200">

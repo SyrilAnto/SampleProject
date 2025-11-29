@@ -12,10 +12,19 @@ export function WorkStatus({ currentUser, workItems, onUpdateStatus }: WorkStatu
   const [filter, setFilter] = useState<'all' | 'pending' | 'in-progress' | 'completed'>('all');
 
   const filteredItems = workItems.filter((item) => {
-    // Filter by assigned user for employees
-    if (currentUser.role === 'employee' && item.assignedTo !== currentUser.username) {
+    // Admin and user1 can view all items
+    if (currentUser.role === 'admin' || currentUser.role === 'user1') {
+      if (filter !== 'all' && item.status !== filter) {
+        return false;
+      }
+      return true;
+    }
+    
+    // user2 and user3 can only view items assigned to them
+    if ((currentUser.role === 'user2' || currentUser.role === 'user3') && item.assignedTo !== currentUser.username) {
       return false;
     }
+    
     // Filter by status
     if (filter !== 'all' && item.status !== filter) {
       return false;
@@ -118,7 +127,7 @@ export function WorkStatus({ currentUser, workItems, onUpdateStatus }: WorkStatu
                   <span className="capitalize">{item.status.replace('-', ' ')}</span>
                 </div>
 
-                {currentUser.role === 'employee' && item.assignedTo === currentUser.username && (
+                {currentUser.role === 'user1' && item.assignedTo === currentUser.username && (
                   <div className="flex space-x-2">
                     {item.status !== 'in-progress' && (
                       <button
@@ -137,6 +146,39 @@ export function WorkStatus({ currentUser, workItems, onUpdateStatus }: WorkStatu
                       </button>
                     )}
                   </div>
+                )}
+
+                {(currentUser.role === 'user2' || currentUser.role === 'user3') && item.assignedTo === currentUser.username && (
+                  <div className="flex space-x-2">
+                    {item.status !== 'in-progress' && (
+                      <button
+                        onClick={() => onUpdateStatus(item.id, 'in-progress')}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        Start Work
+                      </button>
+                    )}
+                    {item.status === 'in-progress' && (
+                      <button
+                        onClick={() => onUpdateStatus(item.id, 'completed')}
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                      >
+                        Mark Complete
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {currentUser.role === 'user1' && item.assignedTo !== currentUser.username && (
+                  <select
+                    value={item.status}
+                    onChange={(e) => onUpdateStatus(item.id, e.target.value as WorkItem['status'])}
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                  </select>
                 )}
 
                 {currentUser.role === 'admin' && (

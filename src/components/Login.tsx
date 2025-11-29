@@ -89,8 +89,10 @@ export function Login({ onLogin }: LoginProps) {
         <div className="mt-6 p-4 bg-gray-50 rounded-lg">
           <p className="text-gray-600 mb-2">Demo Credentials:</p>
           <div className="space-y-1">
-            <p className="text-gray-700">Admin: admin / admin123</p>
-            <p className="text-gray-700">User: user1 / pass123</p>
+            <p className="text-gray-700"><strong>Admin:</strong> admin / admin123 (Assign work, view status, view reports)</p>
+            <p className="text-gray-700"><strong>User1:</strong> user1 / pass123 (Assign work, view & update status)</p>
+            <p className="text-gray-700"><strong>User2:</strong> user2 / pass123 (View & update assigned work only)</p>
+            <p className="text-gray-700"><strong>User3:</strong> user3 / pass123 (View & update assigned work only)</p>
           </div>
         </div>
       </div>
